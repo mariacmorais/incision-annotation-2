@@ -99,9 +99,7 @@ function populateClipSelect(clips) {
 
 // NEW: Function to load the expert JSON
 async function loadExpertAnnotation(clipId) {
-    // ASSUMPTION: The expert JSON files are saved in an 'annotations/expert/' 
-    // directory on your GitHub Pages site, named after the clipId.
-    const jsonPath = `annotations/expert/${clipId}.json`; 
+    const jsonPath = `expert-annotations/${clipId}.json`; // path of where the JSON files are
     try {
         const response = await fetch(jsonPath);
         if (!response.ok) {
