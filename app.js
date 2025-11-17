@@ -23,6 +23,9 @@ let participantIdValue = "";
 const overlayCtx = finalFrameCanvas.getContext("2d");
 const annotationCtx = annotationCanvas.getContext("2d");
 
+const EXPERT_ANNOTATION_BASE_URL = 
+    "https://github.com/mariacmorais/incision-annotation-2/tree/main/expert-annotations";
+
 let frameCaptured = false;
 let currentClip = null;
 let activeLine = null;
@@ -99,7 +102,7 @@ function populateClipSelect(clips) {
 
 // NEW: Function to load the expert JSON
 async function loadExpertAnnotation(clipId) {
-    const jsonPath = `expert-annotations/${clipId}.json`; // path of where the JSON files are
+    const jsonPath = `${EXPERT_ANNOTATION_BASE_URL}${clipId}.json`; // path of where the JSON files are
     try {
         const response = await fetch(jsonPath);
         if (!response.ok) {
@@ -110,6 +113,8 @@ async function loadExpertAnnotation(clipId) {
         return await response.json();
     } catch (error) {
         console.error("Error fetching expert annotation:", error);
+        // If there's a CORS or network error, this is a helpful warning
+        showToast("Error loading expert data. Check CORS settings or URL path in app.js.");
         return null;
     }
 }
