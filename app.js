@@ -24,7 +24,7 @@ const overlayCtx = finalFrameCanvas.getContext("2d");
 const annotationCtx = annotationCanvas.getContext("2d");
 
 const EXPERT_ANNOTATION_BASE_URL = 
-    "https://github.com/mariacmorais/incision-annotation-2/expert-annotations/";
+    "https://github.com/mariacmorais/incision-annotation-2/tree/main/expert-annotations/";
 
 let frameCaptured = false;
 let currentClip = null;
