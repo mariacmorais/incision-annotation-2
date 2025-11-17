@@ -26,6 +26,7 @@ const annotationCtx = annotationCanvas.getContext("2d");
 let frameCaptured = false;
 let currentClip = null;
 let activeLine = null;
+let expertLines = null; // NEW: Holds the loaded expert annotation data
 let pointerDown = false;
 let latestPayload = null;
 let submissionInFlight = false;
@@ -96,7 +97,26 @@ function populateClipSelect(clips) {
   loadSelectedClip();
 }
 
-function loadSelectedClip() {
+// NEW: Function to load the expert JSON
+async function loadExpertAnnotation(clipId) {
+    // ASSUMPTION: The expert JSON files are saved in an 'annotations/expert/' 
+    // directory on your GitHub Pages site, named after the clipId.
+    const jsonPath = `annotations/expert/${clipId}.json`; 
+    try {
+        const response = await fetch(jsonPath);
+        if (!response.ok) {
+            // Log a warning if not found, but don't fail, as some clips might not have expert data
+            console.warn(`Expert annotation not found for clip: ${clipId}. Looking for: ${jsonPath}`);
+            return null;
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching expert annotation:", error);
+        return null;
+    }
+}
+
+async function loadSelectedClip() {
   const option = clipSelect.selectedOptions[0];
   if (!option) return;
 
@@ -114,6 +134,12 @@ function loadSelectedClip() {
     src,
     poster: option.dataset.poster || "",
   };
+
+  // NEW: Load expert lines before continuing
+  expertLines = await loadExpertAnnotation(currentClip.id);
+  if (expertLines) {
+      console.log(`Loaded expert lines for ${currentClip.id}`);
+  }
 
   canvasContainer.hidden = true;
   video.removeAttribute("controls");
@@ -172,6 +198,7 @@ function resetAnnotationState() {
   teardownHelperVideo();
   frameCaptured = false;
   activeLine = null;
+  expertLines = null; // NEW: Clear expert lines when state is reset (e.g., changing clips)
   pointerDown = false;
   latestPayload = null;
   submissionInFlight = false;
@@ -308,8 +335,11 @@ function captureFrameImage(source, frameTimeValue) {
 
   frameCaptured = true;
   canvasContainer.hidden = false;
-  annotationStatus.textContent =
-    "Final frame ready. Review the clip above and draw your incision when ready.";
+  // NEW: Update status to reference the safety corridor
+  annotationStatus.textContent = expertLines
+    ? "Final frame ready. Draw your incision line on top of the safety corridor." 
+    : "Final frame ready. Review the clip above and draw your incision when ready.";
+
   if (firstCapture) {
     if (video.paused) {
       videoStatus.textContent = "Final frame captured. Replay the clip if you need another look.";
@@ -323,6 +353,10 @@ function captureFrameImage(source, frameTimeValue) {
     ((frameTimeValue ?? source.currentTime ?? 0) || 0).toFixed(3)
   );
   capturedFrameTimeValue = Number.isFinite(numericTime) ? numericTime : 0;
+  
+  // NEW: Redraw canvas to show expert lines immediately after capture
+  redrawCanvas();
+
   return true;
 }
 
@@ -388,8 +422,9 @@ function handleVideoTimeUpdate() {
     if (!success) {
       return;
     }
-    annotationStatus.textContent =
-      "Final frame ready. Review the clip above and draw your incision when ready.";
+    annotationStatus.textContent = expertLines
+      ? "Final frame ready. Draw your incision line on top of the safety corridor." 
+      : "Final frame ready. Review the clip above and draw your incision when ready.";
   }
 }
 
@@ -398,7 +433,8 @@ function handleReplay() {
   annotationStatus.textContent =
     "Final frame remains below. Review the clip again and adjust your line if needed.";
   activeLine = null;
-  annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
+  // CHANGE: Call redrawCanvas to clear the user line while keeping expert lines
+  redrawCanvas(); 
   clearLineBtn.disabled = true;
   submitAnnotationBtn.disabled = true;
   if (submissionConfig.endpoint) {
@@ -439,12 +475,47 @@ function getPointerPosition(evt) {
   return { x, y };
 }
 
-function drawLine(line) {
+// REPLACED `drawLine(line)` with `redrawCanvas()`
+function redrawCanvas() {
   annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
+
+  // 1. Draw Expert Lines (The Safety Corridor)
+  if (expertLines && Array.isArray(expertLines.incisionDetails)) {
+      const ctx = annotationCtx;
+      const width = annotationCanvas.width;
+      const height = annotationCanvas.height;
+
+      // Expert style: dashed red
+      ctx.strokeStyle = "rgba(255, 0, 0, 0.7)"; 
+      ctx.lineWidth = Math.max(2, width * 0.002);
+      ctx.setLineDash([8, 6]); // Use dashed line for clarity
+      
+      expertLines.incisionDetails.forEach(detail => {
+          const normalizedLine = detail.normalized;
+          
+          const startX = normalizedLine.start.x * width;
+          const startY = normalizedLine.start.y * height;
+          const endX = normalizedLine.end.x * width;
+          const endY = normalizedLine.end.y * height;
+          
+          ctx.beginPath();
+          ctx.moveTo(startX, startY);
+          ctx.lineTo(endX, endY);
+          ctx.stroke();
+      });
+
+      // Reset styles for user drawing
+      ctx.setLineDash([]); 
+  }
+
+  // 2. Draw User's Active Line (Always drawn on top)
+  const line = activeLine;
   if (!line) return;
-  annotationCtx.strokeStyle = "#38bdf8";
+
+  annotationCtx.strokeStyle = "#38bdf8"; // User's line color (blue)
   annotationCtx.lineWidth = Math.max(4, annotationCanvas.width * 0.004);
   annotationCtx.lineCap = "round";
+  
   annotationCtx.beginPath();
   annotationCtx.moveTo(line.start.x, line.start.y);
   annotationCtx.lineTo(line.end.x, line.end.y);
@@ -517,6 +588,11 @@ function updateSubmissionPayload() {
     generatedAt: new Date().toISOString(),
     participantId: participantIdValue || "",
     filenameHint,
+    // NEW: Include a reference to the loaded expert data (optional, but good for comparison)
+    expertAnnotation: expertLines ? {
+      clipId: expertLines.clipId,
+      incisions: expertLines.incisions || expertLines.incisionDetails.map(d => d.normalized),
+    } : null,
   };
 
   latestPayload = payload;
@@ -550,14 +626,16 @@ function handlePointerDown(evt) {
   pointerDown = true;
   const start = getPointerPosition(evt);
   activeLine = { start, end: start };
-  drawLine(activeLine);
+  // CHANGE: Call redrawCanvas
+  redrawCanvas(); 
 }
 
 function handlePointerMove(evt) {
   if (!pointerDown || !activeLine) return;
   evt.preventDefault();
   activeLine.end = getPointerPosition(evt);
-  drawLine(activeLine);
+  // CHANGE: Call redrawCanvas
+  redrawCanvas();
 }
 
 function handlePointerUp(evt) {
@@ -569,7 +647,8 @@ function handlePointerUp(evt) {
   evt.preventDefault();
   pointerDown = false;
   activeLine.end = getPointerPosition(evt);
-  drawLine(activeLine);
+  // CHANGE: Call redrawCanvas
+  redrawCanvas();
   clearLineBtn.disabled = false;
   annotationStatus.textContent = "Incision line recorded. Submit below.";
   updateSubmissionPayload();
@@ -578,9 +657,11 @@ function handlePointerUp(evt) {
 function clearLine() {
   activeLine = null;
   pointerDown = false;
-  annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
-  annotationStatus.textContent =
-    "Final frame ready. Draw your incision line.";
+  // CHANGE: Call redrawCanvas to clear the user line while preserving expert lines
+  redrawCanvas(); 
+  annotationStatus.textContent = expertLines
+    ? "Final frame ready. Draw your incision line on top of the safety corridor."
+    : "Final frame ready. Draw your incision line.";
   clearLineBtn.disabled = true;
   updateSubmissionPayload();
 }
