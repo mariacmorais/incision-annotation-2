@@ -488,8 +488,8 @@ function redrawCanvas() {
       const height = annotationCanvas.height;
 
       // Expert style: dashed red
-      ctx.strokeStyle = "rgba(255, 0, 0, 0.7)"; 
-      ctx.lineWidth = Math.max(2, width * 0.002);
+      ctx.strokeStyle = "rgba(0, 255, 0, 0.7)"; 
+      ctx.lineWidth = Math.max(2, width * 0.004);
       ctx.setLineDash([8, 6]); // Use dashed line for clarity
       
       expertLines.incisionDetails.forEach(detail => {
