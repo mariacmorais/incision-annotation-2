@@ -101,7 +101,7 @@ function populateClipSelect(clips) {
 
 // NEW: Function to load the expert JSON
 async function loadExpertAnnotation(clipId) {
-    const jsonPath = `${EXPERT_ANNOTATION_BASE_URL}${clipId}.json`; // path of where the JSON files are
+    const jsonPath = `${EXPERT_ANNOTATION_BASE_URL}${clipId}_filicori.json`; // path of where the JSON files are
     try {
         const response = await fetch(jsonPath);
         if (!response.ok) {
