@@ -42,7 +42,7 @@ window.ANNOTATION_CLIPS = [
   {
     id: "clip_06",
     label: "Clip 6",
-    src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_06.mp4",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_06.mp4",
     poster: "",
   },
   // Clip 07 //
