@@ -477,6 +477,20 @@ function getPointerPosition(evt) {
   return { x, y };
 }
 
+// Added Normalize from Pixels (jan 8th, 1355)
+function normalizeFromPixels(pixels) {
+  return {
+    start: {
+      x: pixels.start.x / annotationCanvas.width,
+      y: pixels.start.y / annotationCanvas.height,
+    },
+    end: {
+      x: pixels.end.x / annotationCanvas.width,
+      y: pixels.end.y / annotationCanvas.height,
+    },
+  };
+}
+
 // REPLACED `drawLine(line)` with `redrawCanvas()`
 function redrawCanvas() {
   annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
@@ -493,7 +507,7 @@ function redrawCanvas() {
       ctx.setLineDash([8, 6]); // Use dashed line for clarity
       
       expertLines.incisionDetails.forEach(detail => {
-          const normalizedLine = detail.normalized;
+          const normalizedLine = detail.normalized ?? normalizeFromPixels(detail.pixels);
           
           const startX = normalizedLine.start.x * width;
           const startY = normalizedLine.start.y * height;
