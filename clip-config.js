@@ -1,8 +1,3 @@
-// Replace the sample entries with your own clips. Add a new object to the array
-// for each video you want participants to review. Provide absolute HTTPS URLs
-// (e.g., https://your-org.github.io/study/clip-01.mp4) when hosting on GitHub
-// Pages, REDCap, or other survey tools. Avoid referencing local file-system
-// paths such as /Users/... or C:\... because participants cannot reach them.
 window.ANNOTATION_CLIPS = [
   {
     id: "clip_01",
