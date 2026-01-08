@@ -75,7 +75,7 @@ function populateClipSelect(clips) {
 
   clips.forEach((clip, index) => {
     const option = document.createElement("option");
-    option.value = clip.id ?? `clip-${index}`;
+    option.value = clip.id ?? `clip_${index}`;
     option.textContent = clip.label ?? option.value;
     option.dataset.src = clip.src;
     option.dataset.poster = clip.poster || "";
