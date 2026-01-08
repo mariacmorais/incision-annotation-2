@@ -477,16 +477,20 @@ function getPointerPosition(evt) {
   return { x, y };
 }
 
-// Added Normalize from Pixels (jan 8th, 1355)
-function normalizeFromPixels(pixels) {
+// Modify this function to accept 'referenceSize' - modified Jan 8th, 14:07
+function normalizeFromPixels(pixels, referenceSize) {
+  // Use the reference size from JSON if available, otherwise fallback to current canvas
+  const width = referenceSize ? referenceSize.width : annotationCanvas.width;
+  const height = referenceSize ? referenceSize.height : annotationCanvas.height;
+
   return {
     start: {
-      x: pixels.start.x / annotationCanvas.width,
-      y: pixels.start.y / annotationCanvas.height,
+      x: pixels.start.x / width,
+      y: pixels.start.y / height,
     },
     end: {
-      x: pixels.end.x / annotationCanvas.width,
-      y: pixels.end.y / annotationCanvas.height,
+      x: pixels.end.x / width,
+      y: pixels.end.y / height,
     },
   };
 }
@@ -505,10 +509,11 @@ function redrawCanvas() {
       ctx.strokeStyle = "rgba(0, 255, 0, 0.7)"; 
       ctx.lineWidth = Math.max(2, width * 0.005);
       ctx.setLineDash([8, 6]); // Use dashed line for clarity
-      
+
       expertLines.incisionDetails.forEach(detail => {
-          const normalizedLine = detail.normalized ?? normalizeFromPixels(detail.pixels);
-          
+    // PASS 'expertLines.canvasSize' AS THE SECOND ARGUMENT
+          const normalizedLine = detail.normalized ?? 
+                                 normalizeFromPixels(detail.pixels, expertLines.canvasSize);          
           const startX = normalizedLine.start.x * width;
           const startY = normalizedLine.start.y * height;
           const endX = normalizedLine.end.x * width;
