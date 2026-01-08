@@ -38,6 +38,41 @@ window.ANNOTATION_CLIPS = [
     src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_05.mp4",
     poster: "",
   },
+  // Clip 06 //
+  {
+    id: "clip_06",
+    label: "Clip 6",
+    src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_06.mp4",
+    poster: "",
+  },
+  // Clip 07 //
+  {
+    id: "clip_07",
+    label: "Clip 7",
+    src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_07.mp4",
+    poster: "",
+  },
+  // Clip 08 //
+  {
+    id: "clip_08",
+    label: "Clip 8",
+    src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_08.mp4",
+    poster: "",
+  },
+  // Clip 09 //
+  {
+    id: "clip_09",
+    label: "Clip 9",
+    src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_09.mp4",
+    poster: "",
+  },
+  // Clip 10 //
+  {
+    id: "clip_10",
+    label: "Clip 10",
+    src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_10.mp4",
+    poster: "",
+  },
 ];
 
 // Configure where annotations are sent after participants submit.
