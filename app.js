@@ -23,7 +23,7 @@ let participantIdValue = "";
 const overlayCtx = finalFrameCanvas.getContext("2d");
 const annotationCtx = annotationCanvas.getContext("2d");
 
-const EXPERT_ANNOTATION_BASE_URL = "expert-annotations/";
+const EXPERT_ANNOTATION_BASE_URL = "expert-annotations";
 
 let frameCaptured = false;
 let currentClip = null;
