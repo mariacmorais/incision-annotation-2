@@ -1,0 +1,83 @@
+﻿{
+  "canvasSize": {
+    "height": 720,
+    "width": 1280
+  },
+  "capturedFrameTime": 9.127,
+  "clipId": "clip_06",
+  "clipLabel": "Clip 6",
+  "filenameHint": "mock_clip_06.json",
+  "generatedAt": "2026-01-12T15:08:32.248Z",
+  "incisionDetails": [
+    {
+      "normalized": {
+        "end": {
+          "x": 0.752793710443038,
+          "y": 0.7237482462293932
+        },
+        "start": {
+          "x": 0.6455510779272152,
+          "y": 0.8145277972641178
+        }
+      },
+      "pixels": {
+        "end": {
+          "x": 963.58,
+          "y": 521.1
+        },
+        "length": 152.04,
+        "start": {
+          "x": 826.31,
+          "y": 586.46
+        }
+      }
+    },
+    {
+      "normalized": {
+        "end": {
+          "x": 0.7835307060917721,
+          "y": 0.7897886706418801
+        },
+        "start": {
+          "x": 0.6595690763449367,
+          "y": 0.8947189582602596
+        }
+      },
+      "pixels": {
+        "end": {
+          "x": 1002.92,
+          "y": 568.65
+        },
+        "length": 175.74,
+        "start": {
+          "x": 844.25,
+          "y": 644.2
+        }
+      }
+    }
+  ],
+  "incisions": [
+    {
+      "end": {
+        "x": 0.752793710443038,
+        "y": 0.7237482462293932
+      },
+      "start": {
+        "x": 0.6455510779272152,
+        "y": 0.8145277972641178
+      }
+    },
+    {
+      "end": {
+        "x": 0.7835307060917721,
+        "y": 0.7897886706418801
+      },
+      "start": {
+        "x": 0.6595690763449367,
+        "y": 0.8947189582602596
+      }
+    }
+  ],
+  "participantId": "mock",
+  "videoSrc": "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_06.mp4"
+}
