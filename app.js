@@ -100,22 +100,23 @@ function populateClipSelect(clips) {
 }
 
 // NEW: Function to load the expert JSON
-async function loadExpertAnnotation(clipId) {
-    const jsonPath = `${EXPERT_ANNOTATION_BASE_URL}${clipId}_gt.json`; // path of where the JSON files are
-    try {
-        const response = await fetch(jsonPath);
-        if (!response.ok) {
-            // Log a warning if not found, but don't fail, as some clips might not have expert data
-            console.warn(`Expert annotation not found for clip: ${clipId}. Looking for: ${jsonPath}`);
-            return null;
-        }
-        return await response.json();
-    } catch (error) {
-        console.error("Error fetching expert annotation:", error);
-        // If there's a CORS or network error, this is a helpful warning
-        showToast("Error loading expert data. Check CORS settings or URL path in app.js.");
-        return null;
+async function loadExpertAnnotation(clipId, annotationType = "gt") {
+  const basePath = annotationType === "mock" ? "mock-annotations/" : "expert-annotations/";
+  const suffix = annotationType === "mock" ? "_mock.json" : "_gt.json";
+  const jsonPath = `${basePath}${clipId}${suffix}`;
+
+  try {
+    const response = await fetch(jsonPath);
+    if (!response.ok) {
+      console.warn(`Annotation not found for clip: ${clipId}. Tried: ${jsonPath}`);
+      return null;
     }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching annotation:", error);
+    showToast("Error loading annotation. Check console and server.");
+    return null;
+  }
 }
 
 async function loadSelectedClip() {
@@ -138,7 +139,17 @@ async function loadSelectedClip() {
   };
 
   // NEW: Load expert lines before continuing
-  expertLines = await loadExpertAnnotation(currentClip.id);
+  // Before:
+expertLines = await loadExpertAnnotation(currentClip.id);
+
+// After:
+const annotationType = currentClip.annotationType || (
+  currentClip.id.includes("_mock") ? "mock" : "gt"
+);
+const clipIdBase = currentClip.id.replace(/_(mock|gt)$/, "");
+
+expertLines = await loadExpertAnnotation(clipIdBase, annotationType);
+  
   if (expertLines) {
       console.log(`Loaded expert lines for ${currentClip.id}`);
   }
