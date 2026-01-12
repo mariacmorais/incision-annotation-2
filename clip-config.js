@@ -1,79 +1,167 @@
 window.ANNOTATION_CLIPS = [
+  // Clip 01
   {
-    id: "clip_01",
+    id: "clip_01_gt",
     label: "Clip 1 Ground-Truth",
     src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_01.mp4",
     poster: "",
+    annotationType: "gt"
   },
-  // Clip 02 //
   {
-    id: "clip_02",
+    id: "clip_01_mock",
+    label: "Clip 1 Mock",
+    src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_01.mp4",
+    poster: "",
+    annotationType: "mock"
+  },
+
+  // Clip 02
+  {
+    id: "clip_02_gt",
     label: "Clip 2 Ground-Truth",
     src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_02.mp4",
     poster: "",
+    annotationType: "gt"
   },
-  // Clip 03 //
   {
-    id: "clip_03",
+    id: "clip_02_mock",
+    label: "Clip 2 Mock",
+    src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_02.mp4",
+    poster: "",
+    annotationType: "mock"
+  },
+
+  // Clip 03
+  {
+    id: "clip_03_gt",
     label: "Clip 3 Ground-Truth",
     src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_03.mp4",
     poster: "",
+    annotationType: "gt"
   },
-  // Clip 04 //
   {
-    id: "clip_04",
+    id: "clip_03_mock",
+    label: "Clip 3 Mock",
+    src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_03.mp4",
+    poster: "",
+    annotationType: "mock"
+  },
+
+  // Clip 04
+  {
+    id: "clip_04_gt",
     label: "Clip 4 Ground-Truth",
     src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_04.mp4",
     poster: "",
+    annotationType: "gt"
   },
-  // Clip 05 //
   {
-    id: "clip_05",
+    id: "clip_04_mock",
+    label: "Clip 4 Mock",
+    src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_04.mp4",
+    poster: "",
+    annotationType: "mock"
+  },
+
+  // Clip 05
+  {
+    id: "clip_05_gt",
     label: "Clip 5 Ground-Truth",
     src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_05.mp4",
     poster: "",
+    annotationType: "gt"
   },
-  // Clip 06 //
   {
-    id: "clip_06",
+    id: "clip_05_mock",
+    label: "Clip 5 Mock",
+    src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_05.mp4",
+    poster: "",
+    annotationType: "mock"
+  },
+
+  // Clip 06
+  {
+    id: "clip_06_gt",
     label: "Clip 6 Ground-Truth",
     src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_06.mp4",
     poster: "",
+    annotationType: "gt"
   },
-  // Clip 07 //
   {
-    id: "clip_07",
+    id: "clip_06_mock",
+    label: "Clip 6 Mock",
+    src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_06.mp4",
+    poster: "",
+    annotationType: "mock"
+  },
+
+  // Clip 07
+  {
+    id: "clip_07_gt",
     label: "Clip 7 Ground-Truth",
     src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_07.mp4",
     poster: "",
+    annotationType: "gt"
   },
-  // Clip 08 //
   {
-    id: "clip_08",
+    id: "clip_07_mock",
+    label: "Clip 7 Mock",
+    src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_07.mp4",
+    poster: "",
+    annotationType: "mock"
+  },
+
+  // Clip 08
+  {
+    id: "clip_08_gt",
     label: "Clip 8 Ground-Truth",
     src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_08.mp4",
     poster: "",
+    annotationType: "gt"
   },
-  // Clip 09 //
   {
-    id: "clip_09",
+    id: "clip_08_mock",
+    label: "Clip 8 Mock",
+    src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_08.mp4",
+    poster: "",
+    annotationType: "mock"
+  },
+
+  // Clip 09
+  {
+    id: "clip_09_gt",
     label: "Clip 9 Ground-Truth",
     src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_09.mp4",
     poster: "",
+    annotationType: "gt"
   },
-  // Clip 10 //
   {
-    id: "clip_10",
+    id: "clip_09_mock",
+    label: "Clip 9 Mock",
+    src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_09.mp4",
+    poster: "",
+    annotationType: "mock"
+  },
+
+  // Clip 10
+  {
+    id: "clip_10_gt",
     label: "Clip 10 Ground-Truth",
     src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_10.mp4",
     poster: "",
+    annotationType: "gt"
+  },
+  {
+    id: "clip_10_mock",
+    label: "Clip 10 Mock",
+    src: "https://raw.githubusercontent.com/mariacmorais/incision-annotation-2/main/clip_10.mp4",
+    poster: "",
+    annotationType: "mock"
   },
 ];
 
-// Configure where annotations are sent after participants submit.
-// Replace `endpoint` with your secure collection URL.
 window.ANNOTATION_SUBMISSION = {
-  endpoint: "https://formspree.io/f/xanagplk", // ← your actual Formspree endpoint
+  endpoint: "https://formspree.io/f/xanagplk",
   method: "POST",
   headers: {
     "Content-Type": "application/json"
