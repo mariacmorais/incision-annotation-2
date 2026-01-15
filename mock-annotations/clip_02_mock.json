@@ -1,0 +1,34 @@
+{
+    "canvasSize": {
+        "width": 1280,
+        "height": 720
+    },
+    "incisionDetails": [
+        {
+            "pixels": {
+                "start": {
+                    "x": 551.0225,
+                    "y": 341.21965424233883
+                },
+                "end": {
+                    "x": 769.425,
+                    "y": 252.1371542423388
+                }
+            }
+        },
+        {
+            "pixels": {
+                "start": {
+                    "x": 588.3025,
+                    "y": 389.76715424233885
+                },
+                "end": {
+                    "x": 789.3075,
+                    "y": 308.47465424233883
+                }
+            }
+        }
+    ],
+    "participantId": "ground_truth",
+    "videoSrc": "https://example.com/video.mp4"
+}
