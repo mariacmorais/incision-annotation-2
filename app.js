@@ -1,8 +1,7 @@
 // --- Global References ---
 const participantIdInput = document.getElementById("participantIdInput");
 const participantIdStatus = document.getElementById("participantIdStatus");
-// REMOVED: const clipSelect = document.getElementById("clipSelect");
-const clipProgress = document.getElementById("clipProgress"); // New Header Element
+const clipProgress = document.getElementById("clipProgress"); 
 
 const replayBtn = document.getElementById("replayBtn");
 const video = document.getElementById("caseVideo");
@@ -15,7 +14,7 @@ const annotationStatus = document.getElementById("annotationStatus");
 const toastTemplate = document.getElementById("toastTemplate");
 const submitAnnotationBtn = document.getElementById("submitAnnotationBtn");
 const submissionStatus = document.getElementById("submissionStatus");
-const fatigueInput = document.getElementById("fatigueInput"); // New Fatigue Input
+const fatigueInput = document.getElementById("fatigueInput");
 
 // Sections for Navigation
 const watchCard = document.getElementById("watchCard");
@@ -36,16 +35,15 @@ const overlayCtx = finalFrameCanvas.getContext("2d");
 const annotationCtx = annotationCanvas.getContext("2d");
 
 // --- State Variables ---
-let currentClipIndex = 0; // Tracks which clip we are on
-let allClips = [];        // Loaded from config
+let currentClipIndex = 0;
+let allClips = [];
 let frameCaptured = false;
 let currentClip = null;
 let activeLine = null;
-let expertLines = null;   // Holds the loaded expert/mock annotation data
+let expertLines = null;
 let submissionInFlight = false;
 let capturedFrameTimeValue = 0;
 let helperVideo = null;
-let helperSeekAttempted = false;
 
 // --- Initialization ---
 function initApp() {
@@ -56,7 +54,7 @@ function initApp() {
     return;
   }
 
-  // Support deep linking to a specific index (e.g. ?clipIndex=2)
+  // Support deep linking
   const params = new URLSearchParams(window.location.search);
   const startParam = params.get("clipIndex") || params.get("clip");
   
@@ -100,7 +98,7 @@ function loadClipAtIndex(index) {
   loadClipData(allClips[index]);
 }
 
-// --- Data Loading (Includes your Expert/Mock Logic) ---
+// --- Data Loading (FIXED) ---
 async function loadClipData(clip) {
   if (!clip) return;
   resetAnnotationState();
@@ -110,19 +108,8 @@ async function loadClipData(clip) {
     poster: clip.poster || "",
   };
 
-  // !!! CRITICAL: Determine folder based on annotationType from clip-config.js !!!
-  const annotationType = currentClip.annotationType || "gt";
-  const clipIdBase = currentClip.id.replace(/_(mock|gt)$/, ""); // Handle ID suffixes if present
-  
-  // Load the JSON overlay
-  expertLines = await loadExpertAnnotation(clipIdBase, annotationType);
-  if (expertLines) {
-      console.log(`Loaded ${annotationType} lines for ${currentClip.id}`);
-  }
-
-  // Setup Video
-  canvasContainer.hidden = true;
-  video.removeAttribute("controls");
+  // 1. SETUP VIDEO IMMEDIATELY (Don't wait for JSON)
+  video.removeAttribute("controls"); // Clear first to reset state
   video.setAttribute("playsinline", "");
   video.setAttribute("webkit-playsinline", "");
   video.crossOrigin = "anonymous";
@@ -131,33 +118,41 @@ async function loadClipData(clip) {
   else video.removeAttribute("poster");
 
   video.src = currentClip.src;
+  video.controls = true; // FORCE CONTROLS so user can play
   video.load();
+  
   videoStatus.textContent = `Loading Clip ${currentClipIndex + 1}...`;
   replayBtn.disabled = true;
+
+  // 2. LOAD ANNOTATIONS IN BACKGROUND
+  const annotationType = currentClip.annotationType || "gt";
+  const clipIdBase = currentClip.id.replace(/_(mock|gt)$/, ""); 
+  
+  try {
+    expertLines = await loadExpertAnnotation(clipIdBase, annotationType);
+    if (expertLines) console.log("Annotations loaded.");
+  } catch (e) {
+    console.warn("Could not load annotations (this is okay if none exist)", e);
+  }
+  
   prepareHelperVideo();
 }
 
-// --- Helper: Fetch JSON from expert-annotations/ or mock-annotations/ ---
 async function loadExpertAnnotation(clipId, annotationType = "gt") {
-  // Select folder based on type
   const basePath = annotationType === "mock" ? "mock-annotations/" : "expert-annotations/";
   const suffix = annotationType === "mock" ? "_mock.json" : "_gt.json";
   const jsonPath = `${basePath}${clipId}${suffix}`;
 
   try {
     const response = await fetch(jsonPath);
-    if (!response.ok) {
-      console.warn(`Annotation not found for clip: ${clipId}. Tried: ${jsonPath}`);
-      return null;
-    }
+    if (!response.ok) return null;
     return await response.json();
   } catch (error) {
-    console.error("Error fetching annotation:", error);
     return null;
   }
 }
 
-// --- Canvas Drawing (Renders the overlays) ---
+// --- Canvas Drawing ---
 function redrawCanvas() {
   annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
 
@@ -181,7 +176,6 @@ function drawPolyline(points, color, width) {
   annotationCtx.lineCap = "round";
   annotationCtx.lineJoin = "round";
 
-  // Handle normalized coordinates (0-1) vs pixel coordinates
   const w = annotationCanvas.width;
   const h = annotationCanvas.height;
 
@@ -199,10 +193,8 @@ function captureFrameImage(source, frameTimeValue) {
   const firstCapture = !frameCaptured;
   resizeCanvases(source.videoWidth, source.videoHeight);
   
-  // Draw the video frame
   overlayCtx.drawImage(source, 0, 0, finalFrameCanvas.width, finalFrameCanvas.height);
   
-  // Prepare Annotation Layer
   try {
     const dataUrl = finalFrameCanvas.toDataURL("image/png");
     annotationCanvas.style.backgroundImage = `url(${dataUrl})`;
@@ -218,31 +210,28 @@ function captureFrameImage(source, frameTimeValue) {
   frameCaptured = true;
   canvasContainer.hidden = false;
   
-  // Message Update
   annotationStatus.textContent = expertLines
     ? "Final frame ready. Draw your incision line on top of the safety corridor." 
     : "Final frame ready. Draw your incision when ready.";
 
   if (firstCapture) {
-    videoStatus.textContent = "Final frame captured. You can replay if needed.";
+    videoStatus.textContent = "Final frame captured.";
   }
   
   replayBtn.disabled = false;
   capturedFrameTimeValue = Number((frameTimeValue || 0).toFixed(3));
   
-  // DRAW THE OVERLAYS NOW
   redrawCanvas(); 
 
   return true;
 }
 
-// --- Interaction Handlers (Mouse/Touch) ---
+// --- Interaction Handlers ---
 function handlePointerDown(evt) {
   if (!frameCaptured) return;
   evt.preventDefault();
   annotationCanvas.setPointerCapture(evt.pointerId);
   const pos = getPointerPosition(evt);
-  // Start a new line
   activeLine = [{ x: pos.x / annotationCanvas.width, y: pos.y / annotationCanvas.height }];
   redrawCanvas();
 }
@@ -251,7 +240,6 @@ function handlePointerMove(evt) {
   if (!frameCaptured || !activeLine) return;
   evt.preventDefault();
   const pos = getPointerPosition(evt);
-  // Add points to current line
   activeLine.push({ x: pos.x / annotationCanvas.width, y: pos.y / annotationCanvas.height });
   redrawCanvas();
 }
@@ -260,29 +248,27 @@ function handlePointerUp(evt) {
   if (!frameCaptured || !activeLine) return;
   evt.preventDefault();
   annotationCanvas.releasePointerCapture(evt.pointerId);
-  
-  // Enforce simple line rule (optional validation could go here)
   submitAnnotationBtn.disabled = false;
 }
 
 function getPointerPosition(evt) {
   const rect = annotationCanvas.getBoundingClientRect();
-  const x = evt.offsetX; // Simplest for mouse/pointer events
-  const y = evt.offsetY;
-  return { x, y };
+  return { 
+    x: evt.clientX - rect.left, 
+    y: evt.clientY - rect.top 
+  };
 }
 
 function clearLine() {
   activeLine = null;
   submitAnnotationBtn.disabled = true;
-  redrawCanvas(); // Will still draw expert lines, but clear user line
+  redrawCanvas();
 }
 
-// --- Submission & Next Clip Logic ---
+// --- Submission ---
 async function submitAnnotation() {
   if (submissionInFlight) return;
 
-  // 1. Validations
   if (!participantIdValue) {
     showToast("Please enter a Participant ID first.");
     participantIdInput.focus();
@@ -292,7 +278,7 @@ async function submitAnnotation() {
     showToast("Please draw an incision line first.");
     return;
   }
-  // Fatigue Check
+  // Check Fatigue
   if (fatigueInput && fatigueInput.value === "") {
     showToast("Please select how you are feeling.");
     fatigueInput.focus();
@@ -309,7 +295,7 @@ async function submitAnnotation() {
     clipIndex: currentClipIndex,
     clipSrc: currentClip.src,
     annotation: activeLine,
-    fatigue: fatigueInput.value, // Added Fatigue
+    fatigue: fatigueInput.value,
     imageWidth: finalFrameCanvas.width,
     imageHeight: finalFrameCanvas.height,
     timestamp: new Date().toISOString(),
@@ -349,7 +335,7 @@ async function submitAnnotation() {
   }
 }
 
-// --- Standard Video Helper Functions (Unchanged logic, condensed) ---
+// --- Helpers ---
 function resizeCanvases(width, height) {
   finalFrameCanvas.width = width;
   finalFrameCanvas.height = height;
@@ -372,21 +358,25 @@ function resetAnnotationState() {
   capturedFrameTimeValue = 0;
 }
 
-function handleVideoEnded() { freezeOnFinalFrame(); video.controls = true; }
+function handleVideoEnded() { 
+    freezeOnFinalFrame(); 
+    // Keep controls true so user can replay manually if they want, 
+    // but the frame is captured.
+    video.controls = true; 
+}
 function freezeOnFinalFrame() {
   if (!frameCaptured) captureFrameImage(video, video.duration || video.currentTime);
 }
 function handleReplay() {
   if (!currentClip) return;
   activeLine = null; 
-  redrawCanvas(); // Keeps expert lines, clears user line
+  redrawCanvas();
   clearLineBtn.disabled = true;
   submitAnnotationBtn.disabled = true;
   video.currentTime = 0;
   video.play();
 }
 
-// Helper Video (Hidden video for background capture)
 function prepareHelperVideo() {
   teardownHelperVideo();
   if (!currentClip?.src) return;
@@ -398,7 +388,6 @@ function prepareHelperVideo() {
   helperVideo.addEventListener("seeked", () => captureFrameImage(helperVideo, helperVideo.currentTime) && teardownHelperVideo());
   helperVideo.src = currentClip.src;
   helperVideo.load();
-  // Attempt to seek to near end
   helperVideo.addEventListener("loadedmetadata", () => {
      helperVideo.currentTime = Math.max(helperVideo.duration - 0.05, 0);
   });
@@ -411,9 +400,7 @@ function teardownHelperVideo() {
   }
 }
 
-// --- Utility Functions ---
 function getClips() {
-  // Use config or URL param
   const clips = Array.isArray(window.ANNOTATION_CLIPS) ? [...window.ANNOTATION_CLIPS] : [];
   const params = new URLSearchParams(window.location.search);
   if (params.get("video")) {
@@ -424,7 +411,6 @@ function getClips() {
 
 function applyParticipantId(val) {
   participantIdValue = val.trim();
-  // Updates UI status if needed
 }
 
 function showToast(message) {
@@ -447,10 +433,11 @@ if (window.PointerEvent) {
   annotationCanvas.addEventListener("pointermove", handlePointerMove);
   annotationCanvas.addEventListener("pointerup", handlePointerUp);
 } else {
-  // Fallback for older touch handling if needed
   annotationCanvas.addEventListener("touchstart", (e) => handlePointerDown(e.touches[0]));
+  annotationCanvas.addEventListener("touchmove", (e) => handlePointerMove(e.touches[0]));
+  annotationCanvas.addEventListener("touchend", (e) => handlePointerUp(e.changedTouches[0]));
 }
 
-// --- Start the App ---
+// --- Start ---
 applyParticipantId(participantIdInput.value);
 initApp();
