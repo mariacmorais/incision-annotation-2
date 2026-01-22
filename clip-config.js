@@ -1,185 +1,164 @@
 window.ANNOTATION_CLIPS = [
-  // Clip 01
+  // Clip 03 - Mean Parkland: 1.3 / Mean Nassar: 1.3 //
   {
-    id: "clip_01_gt",
-    label: "Clip 1 Ground-Truth",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_01.mp4",
-    poster: "",
-    annotationType: "gt"
-  },
-  {
-    id: "clip_01_mock",
-    label: "Clip 1 Mock",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_01.mp4",
-    poster: "",
-    annotationType: "mock"
-  },
-
-  // Clip 02
-  {
-    id: "clip_02_gt",
-    label: "Clip 2 Ground-Truth",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_02.mp4",
-    poster: "",
-    annotationType: "gt"
-  },
-  {
-    id: "clip_02_mock",
-    label: "Clip 2 Mock",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_02.mp4",
-    poster: "",
-    annotationType: "mock"
-  },
-
-  // Clip 03
-  {
-    id: "clip_03_gt",
-    label: "Clip 3 Ground-Truth",
+    id: "clip_03",
+    label: "Clip 1",
     src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_03.mp4",
     poster: "",
     annotationType: "gt"
   },
+  // Clip 14 - Mean Parkland: 2.8 / Mean Nassar: 2.2 //
   {
-    id: "clip_03_mock",
-    label: "Clip 3 Mock",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_03.mp4",
-    poster: "",
-    annotationType: "mock"
-  },
-
-  // Clip 04
-  {
-    id: "clip_04_gt",
-    label: "Clip 4 Ground-Truth",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_04.mp4",
+    id: "clip_14",
+    label: "Clip 2",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_14.mp4",
     poster: "",
     annotationType: "gt"
   },
+  // Clip 06 - Mean Parkland: 1.6 / Mean Nassar: 1.3 //
   {
-    id: "clip_04_mock",
-    label: "Clip 4 Mock",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_04.mp4",
-    poster: "",
-    annotationType: "mock"
-  },
-
-  // Clip 05
-  {
-    id: "clip_05_gt",
-    label: "Clip 5 Ground-Truth",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_05.mp4",
-    poster: "",
-    annotationType: "gt"
-  },
-  {
-    id: "clip_05_mock",
-    label: "Clip 5 Mock",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_05.mp4",
-    poster: "",
-    annotationType: "mock"
-  },
-
-  // Clip 06
-  {
-    id: "clip_06_gt",
-    label: "Clip 6 Ground-Truth",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_06.mp4",
-    poster: "",
-    annotationType: "gt"
-  },
-  {
-    id: "clip_06_mock",
-    label: "Clip 6 Mock",
+    id: "clip_06",
+    label: "Clip 3",
     src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_06.mp4",
     poster: "",
     annotationType: "mock"
   },
-
-  // Clip 07
+  // Clip 19 - Mean Parkland: 2.8 / Mean Nassar: 2.2 //
   {
-    id: "clip_07_gt",
-    label: "Clip 7 Ground-Truth",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_07.mp4",
+    id: "clip_19",
+    label: "Clip 4",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_19.mp4",
     poster: "",
     annotationType: "gt"
   },
+  // Clip 10 - Mean Parkland: 2 / Mean Nassar: 1.1 //
   {
-    id: "clip_07_mock",
-    label: "Clip 7 Mock",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_07.mp4",
-    poster: "",
-    annotationType: "mock"
-  },
-
-  // Clip 08
-  {
-    id: "clip_08_gt",
-    label: "Clip 8 Ground-Truth",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_08.mp4",
-    poster: "",
-    annotationType: "gt"
-  },
-  {
-    id: "clip_08_mock",
-    label: "Clip 8 Mock",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_08.mp4",
-    poster: "",
-    annotationType: "mock"
-  },
-
-  // Clip 09
-  {
-    id: "clip_09_gt",
-    label: "Clip 9 Ground-Truth",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_09.mp4",
-    poster: "",
-    annotationType: "gt"
-  },
-  {
-    id: "clip_09_mock",
-    label: "Clip 9 Mock",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_09.mp4",
-    poster: "",
-    annotationType: "mock"
-  },
-
-  // Clip 10
-  {
-    id: "clip_10_gt",
-    label: "Clip 10 Ground-Truth",
+    id: "clip_10",
+    label: "Clip 5",
     src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_10.mp4",
     poster: "",
     annotationType: "gt"
   },
+  // Clip 16 - Mean Parkland: 2.6 / Mean Nassar: 2.6 //
   {
-    id: "clip_10_mock",
-    label: "Clip 10 Mock",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_10.mp4",
+    id: "clip_16",
+    label: "Clip 6",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_16.mp4",
+    poster: "",
+    annotationType: "gt"
+  },
+  // Clip 08 - Mean Parkland: 1.5 / Mean Nassar: 1.1 //
+  {
+    id: "clip_08",
+    label: "Clip 7",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_08.mp4",
+    poster: "",
+    annotationType: "gt"
+  },
+  // Clip 04 - Mean Parkland: 2.8 / Mean Nassar: 2.1 //
+  {
+    id: "clip_04",
+    label: "Clip 8",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_04.mp4",
+    poster: "",
+    annotationType: "gt"
+  },
+  // Clip 12 - Mean Parkland: 1.4 / Mean Nassar: 1.4 //
+  {
+    id: "clip_12",
+    label: "Clip 9",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_12.mp4",
+    poster: "",
+    annotationType: "gt"
+  },
+  // Clip 17 - Mean Parkland: 3.6 / Mean Nassar: 3 //
+  {
+    id: "clip_17",
+    label: "Clip 10",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_17.mp4",
     poster: "",
     annotationType: "mock"
   },
-
-  // Clip 11–20 (same pattern)
-  ...Array.from({ length: 10 }, (_, i) => {
-    const n = i + 11;
-    const num = String(n).padStart(2, "0");
-    return [
-      {
-        id: `clip_${num}_gt`,
-        label: `Clip ${n} Ground-Truth`,
-        src: `https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_${num}.mp4`,
-        poster: "",
-        annotationType: "gt"
-      },
-      {
-        id: `clip_${num}_mock`,
-        label: `Clip ${n} Mock`,
-        src: `https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_${num}.mp4`,
-        poster: "",
-        annotationType: "mock"
-      }
-    ];
-  }).flat()
+  // Clip 07 - Mean Parkland: 2.1 / Mean Nassar: 1.5 //
+  {
+    id: "clip_07",
+    label: "Clip 11",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_07.mp4",
+    poster: "",
+    annotationType: "gt"
+  },
+  // Clip 11 - Mean Parkland: 2.3 / Mean Nassar: 1.6 //
+  {
+    id: "clip_11",
+    label: "Clip 12",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_11_v2.mov",
+    poster: "",
+    annotationType: "gt"
+  },
+  // Clip 20 - Mean Parkland: 2.8 / Mean Nassar: 2.4 //
+  {
+    id: "clip_20",
+    label: "Clip 13",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_20.mp4",
+    poster: "",
+    annotationType: "gt"
+  },
+  // Clip 02 - Mean Parkland: 1 / Mean Nassar: 1 //
+  {
+    id: "clip_02",
+    label: "Clip 14",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_02.mp4",
+    poster: "",
+    annotationType: "mock"
+  },
+  // Clip 18 - Mean Parkland: 3.6 / Mean Nassar: 3.4 //
+  {
+    id: "clip_18",
+    label: "Clip 15",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_18.mp4",
+    poster: "",
+    annotationType: "gt"
+  },
+  // Clip 01 - Mean Parkland: 1.2 / Mean Nassar: 1.2 //
+  {
+    id: "clip_01",
+    label: "Clip 16",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_01.mp4",
+    poster: "",
+    annotationType: "gt"
+  },
+  // Clip 05 - Mean Parkland: 2.1 / Mean Nassar: 1.3 //
+  {
+    id: "clip_05",
+    label: "Clip 17",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_05.mp4",
+    poster: "",
+    annotationType: "gt"
+  },
+  // Clip 13 - Mean Parkland: 2.2 / Mean Nassar: 1.6 //
+  {
+    id: "clip_13",
+    label: "Clip 18",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_13.mp4",
+    poster: "",
+    annotationType: "mock"
+  },
+  // Clip 09 - Mean Parkland: 2 / Mean Nassar: 1.5 //
+  {
+    id: "clip_09",
+    label: "Clip 19",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_09.mp4",
+    poster: "",
+    annotationType: "mock"
+  },
+  // Clip 15 - Mean Parkland: 2.2 / Mean Nassar: 2 //
+  {
+    id: "clip_15",
+    label: "Clip 20",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_15.mp4",
+    poster: "",
+    annotationType: "mock"
+  }
 ];
 
 window.ANNOTATION_SUBMISSION = {
