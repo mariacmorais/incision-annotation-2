@@ -797,18 +797,13 @@ function getFilenameHint() {
 
 function buildAdditionalFields(filenameHint) {
   const fields = { ...baseAdditionalFields };
-
-  const participantId = participantIdInput.value.trim();
-  const fatigue = document.getElementById("fatigueInput")?.value;
-  const confidence = document.getElementById("confidenceInput")?.value;
-
   if (participantIdValue) {
     fields.studyId = participantIdValue;
     fields.participantId = participantIdValue;
   }
-  if (fatigue) fields.fatigue = fatigue;
-  if (confidence) fields.confidence = confidence;
-
+  if (filenameHint) {
+    fields.filenameHint = filenameHint;
+  }
   return fields;
 }
 
