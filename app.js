@@ -74,18 +74,41 @@ async function loadClipByIndex(index) {
     return;
   }
 
-  currentClip = clips[index];
+  const clip = clips[index];
+  currentClip = {
+    id: clip.id,
+    label: clip.label,
+    src: clip.src,
+    poster: clip.poster || "",
+    annotationType: clip.annotationType || "gt"
+  };
+
   resetAnnotationState();
 
-  const clipIdBase = currentClip.id.replace(/_(mock|gt)$/, "");
-  expertLines = await loadExpertAnnotation(clipIdBase, currentClip.annotationType || "gt");
+  // Load expert annotation before video
+  const baseClipId = currentClip.id.replace(/_(mock|gt)$/, "");
+  expertLines = await loadExpertAnnotation(baseClipId, currentClip.annotationType);
+
+  if (expertLines) {
+    console.log(`Loaded expert lines for ${currentClip.id}`);
+  }
+
+  video.removeAttribute("controls");
+  video.setAttribute("playsinline", "");
+  video.setAttribute("webkit-playsinline", "");
+  video.crossOrigin = "anonymous";
+
+  if (currentClip.poster) {
+    video.setAttribute("poster", currentClip.poster);
+  } else {
+    video.removeAttribute("poster");
+  }
 
   video.src = currentClip.src;
-  video.poster = currentClip.poster || "";
   video.load();
 
   prepareHelperVideo();
-  videoStatus.textContent = `Clip ${index + 1} of ${clips.length} loading...`;
+  videoStatus.textContent = `Clip ${index + 1} of ${clips.length} loading…`;
 }
 
 function resetAnnotationState() {
