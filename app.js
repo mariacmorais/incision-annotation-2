@@ -131,21 +131,23 @@ async function loadSelectedClip() {
 
   resetAnnotationState();
 
+  //Last change Jan 22nt 10:28AM
+ const selectedClip = window.ANNOTATION_CLIPS.find(c => c.id === option.value);
   currentClip = {
-    id: option.value,
-    label: option.textContent,
-    src,
-    poster: option.dataset.poster || "",
-  };
+  ...(selectedClip || {}),
+  id: option.value,
+  label: option.textContent,
+  src,
+  poster: option.dataset.poster || "",
+};
 
   // NEW: Load expert lines before continuing
   // Before:
 expertLines = await loadExpertAnnotation(currentClip.id);
 
 // After:
-const annotationType = currentClip.annotationType || (
-  currentClip.id.includes("_mock") ? "mock" : "gt"
-);
+
+const annotationType = currentClip.annotationType || "gt";
 const clipIdBase = currentClip.id.replace(/_(mock|gt)$/, "");
 
 expertLines = await loadExpertAnnotation(clipIdBase, annotationType);
