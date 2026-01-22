@@ -11,25 +11,25 @@
     <header class="layout__header">
       <h1>Cholecystectomy Incision Annotation - Phase 02</h1>
       <p>
-        Review the assigned operative clip, then draw the incision line on the frozen final frame.
-        When you submit, your annotation is sent directly to the study team.
+        Review each operative clip in sequence, then draw the incision line on the frozen final frame.
+        After each submission, the next clip will load automatically. You will see a thank you message after all clips are complete.
       </p>
     </header>
 
     <section class="card">
       <header class="card__header">
-        <h2>1. Enter Participant ID</h2>
+        <h2>1. Enter Your Email</h2>
       </header>
       <div class="card__body card__body--stack">
         <label class="field">
-          <span class="field__label">Participant ID</span>
+          <span class="field__label">Email</span>
           <input
             id="participantIdInput"
             class="field__control"
             type="text"
             inputmode="text"
             autocomplete="off"
-            placeholder="e.g., ABC123"
+            placeholder="e.g., example@samplemail.com"
           />
         </label>
 
@@ -48,30 +48,14 @@
         </label>
 
         <p class="help" id="participantIdStatus">
-          Enter the ID provided by the study team. This is required before submitting your
-          annotation.
-        </p>
-      </div>
-    </section>
-
-    <section class="card">
-      <header class="card__header">
-        <h2>2. Select Clip</h2>
-      </header>
-      <div class="card__body card__body--stack">
-        <label class="field">
-          <span class="field__label">Clip to review</span>
-          <select id="clipSelect" class="field__control"></select>
-        </label>
-        <p class="help">
-          Please review and annotate every clip.
+          Enter your email. This is required before submitting your annotation.
         </p>
       </div>
     </section>
 
     <section class="card" aria-live="polite">
       <header class="card__header card__header--space">
-        <h2>3. Watch Clip</h2>
+        <h2>2. Watch Clip</h2>
         <div class="card__actions">
           <button id="replayBtn" type="button" class="ghost" disabled>Replay Clip</button>
         </div>
@@ -80,17 +64,13 @@
         <div class="video-shell" id="videoShell">
           <video id="caseVideo" playsinline preload="auto"></video>
         </div>
-        <p class="help" id="videoStatus">Select a clip to begin playback.</p>
+        <p class="help" id="videoStatus">Loading first clip…</p>
       </div>
-
-
-
-
     </section>
 
     <section class="card">
       <header class="card__header card__header--space">
-        <h2>4. Annotate Final Frame</h2>
+        <h2>3. Annotate Final Frame</h2>
         <div class="card__actions">
           <button id="clearLineBtn" type="button" class="ghost" disabled>Clear Line</button>
         </div>
@@ -104,13 +84,13 @@
             soon as the frozen frame appears, even if the clip is still playing above.
           </p>
         </div>
-          <p class="help" id="annotationStatus">The final frame appears below shortly. You can keep watching while it prepares.</p>
+        <p class="help" id="annotationStatus">The final frame will appear shortly below. You can keep watching while it prepares.</p>
       </div>
     </section>
 
     <section class="card">
       <header class="card__header">
-        <h2>5. Submit Annotation</h2>
+        <h2>4. Submit Annotation</h2>
       </header>
       <div class="card__body card__body--stack">
         <button id="submitAnnotationBtn" type="button" class="primary" disabled>Submit to Investigator</button>
@@ -124,8 +104,6 @@
   <template id="toastTemplate">
     <div class="toast" role="status" aria-live="polite"></div>
   </template>
-
-
 
   <script src="clip-config.js"></script>
   <script src="app.js"></script>
