@@ -18,7 +18,7 @@
 
     <section class="card">
       <header class="card__header">
-        <h2>1. Enter Participant ID</h2>
+        <h2>1. Participant Information</h2>
       </header>
       <div class="card__body card__body--stack">
         <label class="field">
@@ -32,56 +32,40 @@
             placeholder="e.g., ABC123"
           />
         </label>
+        
+        <label class="field">
+          <span class="field__label">How are you feeling right now?</span>
+          <select id="fatigueInput" class="field__control">
+            <option value="">Select one</option>
+            <option value="1">1 - Fully Alert / Wide Awake</option>
+            <option value="2">2 - Very Fresh</option>
+            <option value="3">3 - Fresh</option>
+            <option value="4">4 - A Little Tired</option>
+            <option value="5">5 - Moderately Tired</option>
+            <option value="6">6 - Extremely Tired</option>
+          </select>
+        </label>
+
         <p class="help" id="participantIdStatus">
-          Enter the ID provided by the study team. This is required before submitting your
-          annotation.
+          Enter your ID and fatigue level. These are required before submitting.
         </p>
       </div>
     </section>
-
 
     <section class="card">
       <header class="card__header">
-        <h2>2. Select Clip</h2>
-      </header>
-      <div class="card__body card__body--stack">
-        <label class="field">
-          <span class="field__label">Clip to review</span>
-          <select id="clipSelect" class="field__control"></select>
-        </label>
-        <p class="help">
-          Please review and annotate every clip.
-        </p>
-      </div>
-    </section>
-
-    <section class="card" aria-live="polite">
-      <header class="card__header card__header--space">
-        <h2>3. Watch Clip</h2>
-        <div class="card__actions">
-          <button id="replayBtn" type="button" class="ghost" disabled>Replay Clip</button>
-        </div>
-      </header>
-      <div class="card__body">
-        <div class="video-shell" id="videoShell">
-          <video id="caseVideo" playsinline preload="auto"></video>
-        </div>
-        <p class="help" id="videoStatus">Select a clip to begin playback.</p>
-      </div>
-
-
-
-
-    </section>
-
-    <section class="card">
-      <header class="card__header card__header--space">
-        <h2>4. Annotate Final Frame</h2>
+        <h2>2. Annotate Final Frame</h2>
         <div class="card__actions">
           <button id="clearLineBtn" type="button" class="ghost" disabled>Clear Line</button>
         </div>
       </header>
       <div class="card__body">
+        <div class="media-container">
+          <video id="caseVideo" playsinline webkit-playsinline></video>
+          <button id="replayBtn" class="secondary" disabled>Replay Clip</button>
+          <p class="help" id="videoStatus">Loading clip...</p>
+        </div>
+
         <canvas id="finalFrame" width="1280" height="720" hidden></canvas>
         <div class="canvas-container" id="canvasContainer" hidden>
           <canvas id="annotationCanvas"></canvas>
@@ -96,7 +80,7 @@
 
     <section class="card">
       <header class="card__header">
-        <h2>5. Submit Annotation</h2>
+        <h2>3. Submit Annotation</h2>
       </header>
       <div class="card__body card__body--stack">
         <button id="submitAnnotationBtn" type="button" class="primary" disabled>Submit to Investigator</button>
@@ -105,15 +89,39 @@
         </p>
       </div>
     </section>
+
+    <section id="confidenceSection" class="card" hidden>
+      <header class="card__header">
+        <h2>4. Final Question</h2>
+      </header>
+      <div class="card__body card__body--stack">
+        <label class="field">
+          <span class="field__label">On a scale from 1 to 5, how confident did you feel that your incision lines were safe and did not cross a danger zone?</span>
+          <select id="confidenceInput" class="field__control" required>
+            <option value="">Select one</option>
+            <option value="1">1 – Very Insecure</option>
+            <option value="2">2 – Slightly insecure</option>
+            <option value="3">3 – Neutral / Not sure</option>
+            <option value="4">4 – With a certain level of confidence</option>
+            <option value="5">5 – Very confident</option>
+          </select>
+        </label>
+        <button id="submitConfidenceBtn" class="primary">Submit Confidence</button>
+      </div>
+    </section>
+
+    <section id="completionCard" class="card" hidden style="text-align: center; padding: 3rem 1rem;">
+      <h2>All Clips Completed</h2>
+      <p style="color: var(--text-muted); margin-top: 1rem;">Thank you for your participation. You may close this window.</p>
+    </section>
+
   </main>
 
   <template id="toastTemplate">
     <div class="toast" role="status" aria-live="polite"></div>
   </template>
 
-
-
-  <script src="clip-config.js"></script>
-  <script src="app.js"></script>
+  <script src="clip-config2.js"></script>
+  <script src="app2.js"></script>
 </body>
 </html>
