@@ -44,9 +44,8 @@
             <option value="6">6 - Extremely Tired</option>
           </select>
         </label>
-
         <p class="help" id="participantIdStatus">
-          Enter your ID and fatigue level. These are required before submitting.
+          Required before starting.
         </p>
       </div>
     </section>
@@ -65,14 +64,14 @@
           <p class="help" id="videoStatus">Loading clip...</p>
         </div>
 
-        <canvas id="finalFrame" width="1280" height="720" hidden></canvas>
+        <canvas id="finalFrame" hidden></canvas>
         <div class="canvas-container" id="canvasContainer" hidden>
           <canvas id="annotationCanvas"></canvas>
           <p class="canvas-hint">
-            Tap or click to place the start of the incision, drag, and release to finish.
+            Tap/Click to start, drag, and release to draw.
           </p>
         </div>
-          <p class="help" id="annotationStatus">The final frame appears below shortly. You can keep watching while it prepares.</p>
+        <p class="help" id="annotationStatus">The final frame appears below when the clip ends.</p>
       </div>
     </section>
 
@@ -110,7 +109,7 @@
 
     <section id="completionCard" class="card" hidden style="text-align: center; padding: 3rem 1rem;">
       <h2>All Clips Completed</h2>
-      <p style="color: var(--text-muted); margin-top: 1rem;">Thank you for your participation. You may close this window.</p>
+      <p style="color: var(--text-muted); margin-top: 1rem;">Thank you! You may close this window.</p>
     </section>
 
   </main>
