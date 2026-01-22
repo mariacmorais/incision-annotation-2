@@ -7,19 +7,19 @@ window.ANNOTATION_CLIPS = [
     poster: "",
     annotationType: "gt"
   },
-  // Clip 14 - Mean Parkland: 2.8 / Mean Nassar: 2.2 //
-  {
-    id: "clip_14",
-    label: "Clip 2",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_14.mp4",
-    poster: "",
-    annotationType: "gt"
-  },
   // Clip 06 - Mean Parkland: 1.6 / Mean Nassar: 1.3 //
   {
     id: "clip_06",
-    label: "Clip 3",
+    label: "Clip 2",
     src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_06.mp4",
+    poster: "",
+    annotationType: "gt"
+  },
+  // Clip 14 - Mean Parkland: 2.8 / Mean Nassar: 2.2 //
+  {
+    id: "clip_14",
+    label: "Clip 3",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_14.mp4",
     poster: "",
     annotationType: "mock"
   },
@@ -39,13 +39,13 @@ window.ANNOTATION_CLIPS = [
     poster: "",
     annotationType: "gt"
   },
-  // Clip 16 - Mean Parkland: 2.6 / Mean Nassar: 2.6 //
+  // Clip 15 - Mean Parkland: 2.2 / Mean Nassar: 2 //
   {
-    id: "clip_16",
+    id: "clip_15",
     label: "Clip 6",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_16.mp4",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_15.mp4",
     poster: "",
-    annotationType: "gt"
+    annotationType: "mock"
   },
   // Clip 08 - Mean Parkland: 1.5 / Mean Nassar: 1.1 //
   {
@@ -61,7 +61,7 @@ window.ANNOTATION_CLIPS = [
     label: "Clip 8",
     src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_04.mp4",
     poster: "",
-    annotationType: "gt"
+    annotationType: "mock"
   },
   // Clip 12 - Mean Parkland: 1.4 / Mean Nassar: 1.4 //
   {
@@ -141,7 +141,7 @@ window.ANNOTATION_CLIPS = [
     label: "Clip 18",
     src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_13.mp4",
     poster: "",
-    annotationType: "mock"
+    annotationType: "gt"
   },
   // Clip 09 - Mean Parkland: 2 / Mean Nassar: 1.5 //
   {
@@ -151,13 +151,13 @@ window.ANNOTATION_CLIPS = [
     poster: "",
     annotationType: "mock"
   },
-  // Clip 15 - Mean Parkland: 2.2 / Mean Nassar: 2 //
+  // Clip 16 - Mean Parkland: 2.6 / Mean Nassar: 2.6 //
   {
-    id: "clip_15",
+    id: "clip_16",
     label: "Clip 20",
-    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_15.mp4",
+    src: "https://raw.githubusercontent.com/mariacmorais/safety-corridor-annotation/main/clip_16.mp4",
     poster: "",
-    annotationType: "mock"
+    annotationType: "gt"
   }
 ];
 
