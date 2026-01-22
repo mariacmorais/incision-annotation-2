@@ -1,6 +1,6 @@
 const participantIdInput = document.getElementById("participantIdInput");
 const participantIdStatus = document.getElementById("participantIdStatus");
-// clipSelect removed
+const clipSelect = document.getElementById("clipSelect");
 const replayBtn = document.getElementById("replayBtn");
 const video = document.getElementById("caseVideo");
 const finalFrameCanvas = document.getElementById("finalFrame");
@@ -12,8 +12,6 @@ const annotationStatus = document.getElementById("annotationStatus");
 const toastTemplate = document.getElementById("toastTemplate");
 const submitAnnotationBtn = document.getElementById("submitAnnotationBtn");
 const submissionStatus = document.getElementById("submissionStatus");
-const clipProgress = document.getElementById("clipProgress");
-const completionCard = document.getElementById("completionCard");
 
 const submissionConfig = window.ANNOTATION_SUBMISSION || {};
 const baseAdditionalFields = { ...(submissionConfig.additionalFields || {}) };
@@ -25,18 +23,18 @@ let participantIdValue = "";
 const overlayCtx = finalFrameCanvas.getContext("2d");
 const annotationCtx = annotationCanvas.getContext("2d");
 
+const EXPERT_ANNOTATION_BASE_URL = "expert-annotations/";
+
 let frameCaptured = false;
 let currentClip = null;
 let activeLine = null;
+let expertLines = null; // NEW: Holds the loaded expert annotation data
 let pointerDown = false;
 let latestPayload = null;
 let submissionInFlight = false;
 let capturedFrameTimeValue = 0;
 let helperVideo = null;
 let helperSeekAttempted = false;
-
-// NEW: Track current index
-let currentClipIndex = 0;
 
 function showToast(message) {
   const toast = toastTemplate.content.firstElementChild.cloneNode(true);
@@ -63,30 +61,69 @@ function getClips() {
   return clips;
 }
 
-// CHANGED: Load by index instead of dropdown selection
-function loadClipByIndex(index) {
-  const clips = getClips();
-  
-  if (index >= clips.length) {
-    handleAllClipsCompleted();
+function populateClipSelect(clips) {
+  clipSelect.innerHTML = "";
+  if (clips.length === 0) {
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "Add clips in clip-config.js";
+    clipSelect.appendChild(option);
+    clipSelect.disabled = true;
+    videoStatus.textContent = "No clip configured.";
     return;
   }
 
-  const clip = clips[index];
-  
-  // Update Progress Text
-  if (clipProgress) {
-    clipProgress.textContent = `(Clip ${index + 1} of ${clips.length})`;
+  clips.forEach((clip, index) => {
+    const option = document.createElement("option");
+    option.value = clip.id ?? `clip_${index}`;
+    option.textContent = clip.label ?? option.value;
+    option.dataset.src = clip.src;
+    option.dataset.poster = clip.poster || "";
+    clipSelect.appendChild(option);
+  });
+
+  clipSelect.disabled = false;
+
+  const params = new URLSearchParams(window.location.search);
+  const clipId = params.get("clip");
+  if (clipId) {
+    const match = [...clipSelect.options].find((opt) => opt.value === clipId);
+    if (match) {
+      clipSelect.value = clipId;
+      loadSelectedClip();
+      return;
+    }
   }
 
-  // Update Button Text for Last Clip
-  if (index === clips.length - 1) {
-    submitAnnotationBtn.textContent = "Submit & Finish";
-  } else {
-    submitAnnotationBtn.textContent = "Submit & Next Clip";
-  }
+  clipSelect.selectedIndex = 0;
+  loadSelectedClip();
+}
 
-  const src = clip.src;
+// NEW: Function to load the expert JSON
+async function loadExpertAnnotation(clipId, annotationType = "gt") {
+  const basePath = annotationType === "mock" ? "mock-annotations/" : "expert-annotations/";
+  const suffix = annotationType === "mock" ? "_mock.json" : "_gt.json";
+  const jsonPath = `${basePath}${clipId}${suffix}`;
+
+  try {
+    const response = await fetch(jsonPath);
+    if (!response.ok) {
+      console.warn(`Annotation not found for clip: ${clipId}. Tried: ${jsonPath}`);
+      return null;
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching annotation:", error);
+    showToast("Error loading annotation. Check console and server.");
+    return null;
+  }
+}
+
+async function loadSelectedClip() {
+  const option = clipSelect.selectedOptions[0];
+  if (!option) return;
+
+  const src = option.dataset.src;
   if (!src) {
     videoStatus.textContent = "Clip source missing.";
     return;
@@ -94,12 +131,30 @@ function loadClipByIndex(index) {
 
   resetAnnotationState();
 
+  //Last change Jan 22nt 10:28AM
+ const selectedClip = window.ANNOTATION_CLIPS.find(c => c.id === option.value);
   currentClip = {
-    id: clip.id,
-    label: clip.label,
-    src,
-    poster: clip.poster || "",
-  };
+  ...(selectedClip || {}),
+  id: option.value,
+  label: option.textContent,
+  src,
+  poster: option.dataset.poster || "",
+};
+
+  // NEW: Load expert lines before continuing
+  // Before:
+expertLines = await loadExpertAnnotation(currentClip.id);
+
+// After:
+
+const annotationType = currentClip.annotationType || "gt";
+const clipIdBase = currentClip.id.replace(/_(mock|gt)$/, "");
+
+expertLines = await loadExpertAnnotation(clipIdBase, annotationType);
+  
+  if (expertLines) {
+      console.log(`Loaded expert lines for ${currentClip.id}`);
+  }
 
   canvasContainer.hidden = true;
   video.removeAttribute("controls");
@@ -117,14 +172,6 @@ function loadClipByIndex(index) {
   videoStatus.textContent = "Loading clip…";
   replayBtn.disabled = true;
   prepareHelperVideo();
-}
-
-function handleAllClipsCompleted() {
-  // Hide the annotation interface
-  document.querySelectorAll('.card:not(#confidenceSection)').forEach(el => el.hidden = true);
-  
-  // Show confidence question
-  document.getElementById("confidenceSection").hidden = false;
 }
 
 function looksLikeLocalPath(value) {
@@ -166,6 +213,7 @@ function resetAnnotationState() {
   teardownHelperVideo();
   frameCaptured = false;
   activeLine = null;
+  expertLines = null; // NEW: Clear expert lines when state is reset (e.g., changing clips)
   pointerDown = false;
   latestPayload = null;
   submissionInFlight = false;
@@ -179,7 +227,7 @@ function resetAnnotationState() {
   if (submissionConfig.endpoint) {
     submissionStatus.textContent = participantIdValue
       ? "Draw the incision on the frozen frame to enable submission."
-      : "Enter your email above before submitting.";
+      : "Enter your participant ID above before submitting.";
   } else {
     submissionStatus.textContent =
       "Investigator submission endpoint not configured. Update clip-config.js.";
@@ -302,8 +350,11 @@ function captureFrameImage(source, frameTimeValue) {
 
   frameCaptured = true;
   canvasContainer.hidden = false;
-  annotationStatus.textContent =
-    "Final frame ready. Review the clip above and draw your incision when ready.";
+  // NEW: Update status to reference the safety corridor
+  annotationStatus.textContent = expertLines
+    ? "Final frame ready. Draw your incision line on top of the safety corridor." 
+    : "Final frame ready. Review the clip above and draw your incision when ready.";
+
   if (firstCapture) {
     if (video.paused) {
       videoStatus.textContent = "Final frame captured. Replay the clip if you need another look.";
@@ -317,6 +368,10 @@ function captureFrameImage(source, frameTimeValue) {
     ((frameTimeValue ?? source.currentTime ?? 0) || 0).toFixed(3)
   );
   capturedFrameTimeValue = Number.isFinite(numericTime) ? numericTime : 0;
+  
+  // NEW: Redraw canvas to show expert lines immediately after capture
+  redrawCanvas();
+
   return true;
 }
 
@@ -382,8 +437,9 @@ function handleVideoTimeUpdate() {
     if (!success) {
       return;
     }
-    annotationStatus.textContent =
-      "Final frame ready. Review the clip above and draw your incision when ready.";
+    annotationStatus.textContent = expertLines
+      ? "Final frame ready. Draw your incision line on top of the safety corridor." 
+      : "Final frame ready. Review the clip above and draw your incision when ready.";
   }
 }
 
@@ -392,13 +448,14 @@ function handleReplay() {
   annotationStatus.textContent =
     "Final frame remains below. Review the clip again and adjust your line if needed.";
   activeLine = null;
-  annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
+  // CHANGE: Call redrawCanvas to clear the user line while keeping expert lines
+  redrawCanvas(); 
   clearLineBtn.disabled = true;
   submitAnnotationBtn.disabled = true;
   if (submissionConfig.endpoint) {
     submissionStatus.textContent = participantIdValue
       ? "Draw the incision on the frozen frame to enable submission."
-      : "Enter your email above before submitting.";
+      : "Enter your participant ID above before submitting.";
   } else {
     submissionStatus.textContent =
       "Investigator submission endpoint not configured. Update clip-config.js.";
@@ -433,12 +490,66 @@ function getPointerPosition(evt) {
   return { x, y };
 }
 
-function drawLine(line) {
+// Modify this function to accept 'referenceSize' - modified Jan 8th, 14:07
+function normalizeFromPixels(pixels, referenceSize) {
+  // Use the reference size from JSON if available, otherwise fallback to current canvas
+  const width = referenceSize ? referenceSize.width : annotationCanvas.width;
+  const height = referenceSize ? referenceSize.height : annotationCanvas.height;
+
+  return {
+    start: {
+      x: pixels.start.x / width,
+      y: pixels.start.y / height,
+    },
+    end: {
+      x: pixels.end.x / width,
+      y: pixels.end.y / height,
+    },
+  };
+}
+
+// REPLACED `drawLine(line)` with `redrawCanvas()`
+function redrawCanvas() {
   annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
+
+  // 1. Draw Expert Lines (The Safety Corridor)
+  if (expertLines && Array.isArray(expertLines.incisionDetails)) {
+      const ctx = annotationCtx;
+      const width = annotationCanvas.width;
+      const height = annotationCanvas.height;
+
+      // Expert style: dashed green
+      ctx.strokeStyle = "rgba(0, 255, 0, 0.7)"; 
+      ctx.lineWidth = Math.max(2, width * 0.005);
+      ctx.setLineDash([8, 6]); // Use dashed line for clarity
+
+      expertLines.incisionDetails.forEach(detail => {
+    // PASS 'expertLines.canvasSize' AS THE SECOND ARGUMENT
+          const normalizedLine = detail.normalized ?? 
+                                 normalizeFromPixels(detail.pixels, expertLines.canvasSize);          
+          const startX = normalizedLine.start.x * width;
+          const startY = normalizedLine.start.y * height;
+          const endX = normalizedLine.end.x * width;
+          const endY = normalizedLine.end.y * height;
+          
+          ctx.beginPath();
+          ctx.moveTo(startX, startY);
+          ctx.lineTo(endX, endY);
+          ctx.stroke();
+      });
+
+      // Reset styles for user drawing
+      ctx.setLineDash([]); 
+  }
+
+  // 2. Draw User's Active Line (Always drawn on top)
+  const line = activeLine;
   if (!line) return;
-  annotationCtx.strokeStyle = "#38bdf8";
+
+  annotationCtx.strokeStyle = "#38bdf8"; // User's line color (blue)
   annotationCtx.lineWidth = Math.max(4, annotationCanvas.width * 0.004);
   annotationCtx.lineCap = "round";
+  
   annotationCtx.beginPath();
   annotationCtx.moveTo(line.start.x, line.start.y);
   annotationCtx.lineTo(line.end.x, line.end.y);
@@ -473,7 +584,7 @@ function updateSubmissionPayload() {
     if (frameCaptured && submissionConfig.endpoint) {
       submissionStatus.textContent = participantIdValue
         ? "Draw the incision and release to submit."
-        : "Enter your email above before submitting.";
+        : "Enter your participant ID above before submitting.";
     }
     return;
   }
@@ -511,6 +622,11 @@ function updateSubmissionPayload() {
     generatedAt: new Date().toISOString(),
     participantId: participantIdValue || "",
     filenameHint,
+    // NEW: Include a reference to the loaded expert data (optional, but good for comparison)
+    expertAnnotation: expertLines ? {
+      clipId: expertLines.clipId,
+      incisions: expertLines.incisions || expertLines.incisionDetails.map(d => d.normalized),
+    } : null,
   };
 
   latestPayload = payload;
@@ -524,7 +640,7 @@ function updateSubmissionPayload() {
 
   if (!participantIdValue) {
     submitAnnotationBtn.disabled = true;
-    submissionStatus.textContent = "Enter your email above before submitting.";
+    submissionStatus.textContent = "Enter your participant ID above before submitting.";
     return;
   }
 
@@ -544,14 +660,16 @@ function handlePointerDown(evt) {
   pointerDown = true;
   const start = getPointerPosition(evt);
   activeLine = { start, end: start };
-  drawLine(activeLine);
+  // CHANGE: Call redrawCanvas
+  redrawCanvas(); 
 }
 
 function handlePointerMove(evt) {
   if (!pointerDown || !activeLine) return;
   evt.preventDefault();
   activeLine.end = getPointerPosition(evt);
-  drawLine(activeLine);
+  // CHANGE: Call redrawCanvas
+  redrawCanvas();
 }
 
 function handlePointerUp(evt) {
@@ -563,7 +681,8 @@ function handlePointerUp(evt) {
   evt.preventDefault();
   pointerDown = false;
   activeLine.end = getPointerPosition(evt);
-  drawLine(activeLine);
+  // CHANGE: Call redrawCanvas
+  redrawCanvas();
   clearLineBtn.disabled = false;
   annotationStatus.textContent = "Incision line recorded. Submit below.";
   updateSubmissionPayload();
@@ -572,26 +691,27 @@ function handlePointerUp(evt) {
 function clearLine() {
   activeLine = null;
   pointerDown = false;
-  annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
-  annotationStatus.textContent =
-    "Final frame ready. Draw your incision line.";
+  // CHANGE: Call redrawCanvas to clear the user line while preserving expert lines
+  redrawCanvas(); 
+  annotationStatus.textContent = expertLines
+    ? "Final frame ready. Draw your incision line on top of the safety corridor."
+    : "Final frame ready. Draw your incision line.";
   clearLineBtn.disabled = true;
   updateSubmissionPayload();
 }
 
-// CHANGED: Now returns a boolean Promise (true = success, false = fail)
 async function submitAnnotation() {
   if (!latestPayload) {
     showToast("Draw the incision before submitting.");
-    return false;
+    return;
   }
 
   if (!submissionConfig.endpoint) {
     showToast("Submission endpoint missing. Update clip-config.js.");
-    return false;
+    return;
   }
 
-  if (submissionInFlight) return false;
+  if (submissionInFlight) return;
 
   submissionInFlight = true;
   submitAnnotationBtn.disabled = true;
@@ -643,26 +763,15 @@ async function submitAnnotation() {
     if (!response.ok) {
       throw new Error(`Request failed with status ${response.status}`);
     }
-    submissionStatus.textContent = "Annotation submitted.";
-    showToast("Annotation sent.");
-    return true; // SUCCESS
+    submissionStatus.textContent = "Annotation submitted. Thank you!";
+    showToast("Annotation sent to investigator.");
   } catch (error) {
     submissionStatus.textContent = "Submission failed. Please try again.";
     submitAnnotationBtn.disabled = false;
-    showToast("Unable to submit. Check connection.");
+    showToast("Unable to submit annotation. Check your connection and try again.");
     console.error(error);
-    return false; // FAILURE
   } finally {
     submissionInFlight = false;
-  }
-}
-
-// NEW: Wrapper to handle submit, then load next
-async function handleSubmitAndNext() {
-  const success = await submitAnnotation();
-  if (success) {
-    currentClipIndex++;
-    loadClipByIndex(currentClipIndex);
   }
 }
 
@@ -670,10 +779,10 @@ function applyParticipantId(rawValue) {
   participantIdValue = (rawValue || "").trim();
   if (participantIdValue) {
     participantIdStatus.textContent =
-      "Participant email recorded. Continue with the steps below.";
+      "Participant ID recorded. Continue with the steps below.";
   } else {
     participantIdStatus.textContent =
-      "Enter your email. This is required before submitting your annotation.";
+      "Enter the ID provided by the study team. This is required before submitting your annotation.";
   }
   updateSubmissionPayload();
 }
@@ -688,37 +797,17 @@ function getFilenameHint() {
 
 function buildAdditionalFields(filenameHint) {
   const fields = { ...baseAdditionalFields };
-
-  const participantId = participantIdInput.value.trim();
-  const age = document.getElementById("ageInput")?.value.trim();
-  const gender = document.getElementById("genderInput")?.value;
-  const level_of_training = document.getElementById("levelInput")?.value;
-  const specialty = document.getElementById("specialtyInput")?.value.trim();
-  const years_of_practice = document.getElementById("yearsPracticeInput")?.value.trim();
-  const familiarity = document.getElementById("familiarityInput")?.value;
-  const fatigue = document.getElementById("fatigueInput")?.value;
-  const confidence = document.getElementById("confidenceInput")?.value;
-
-  if (participantId) {
-    fields.participantId = participantId;
-    fields.studyId = participantId;
+  if (participantIdValue) {
+    fields.studyId = participantIdValue;
+    fields.participantId = participantIdValue;
   }
-  if (filenameHint) fields.filenameHint = filenameHint;
-  if (age) fields.age = age;
-  if (gender) fields.gender = gender;
-  if (level_of_training) fields.level_of_training = level_of_training;
-  if (specialty) fields.specialty = specialty;
-  if (years_of_practice) fields.years_of_practice = years_of_practice;
-  if (familiarity) fields.familiarity = familiarity;
-  if (fatigue) fields.fatigue = fatigue;
-  if (confidence) fields.confidence = confidence;
-
+  if (filenameHint) {
+    fields.filenameHint = filenameHint;
+  }
   return fields;
 }
 
-// Replaced clipSelect listener with simple load
-// clipSelect.addEventListener("change", loadSelectedClip); 
-
+clipSelect.addEventListener("change", loadSelectedClip);
 replayBtn.addEventListener("click", handleReplay);
 video.addEventListener("loadeddata", handleVideoLoaded);
 video.addEventListener("error", handleVideoError, { once: false });
@@ -726,9 +815,7 @@ video.addEventListener("play", handleVideoPlay);
 video.addEventListener("timeupdate", handleVideoTimeUpdate);
 video.addEventListener("ended", handleVideoEnded);
 clearLineBtn.addEventListener("click", clearLine);
-
-// CHANGED: Use the wrapper function
-submitAnnotationBtn.addEventListener("click", handleSubmitAndNext);
+submitAnnotationBtn.addEventListener("click", submitAnnotation);
 
 participantIdInput.addEventListener("input", (event) => {
   applyParticipantId(event.target.value);
@@ -751,48 +838,6 @@ if (window.PointerEvent) {
   annotationCanvas.addEventListener("touchcancel", handlePointerUp, { passive: false });
 }
 
-// INITIALIZATION
 const availableClips = getClips();
-loadClipByIndex(0); // Start at index 0
+populateClipSelect(availableClips);
 applyParticipantId(participantIdInput.value);
-
-
-// Confidence submission handler
-document.getElementById("submitConfidenceBtn").addEventListener("click", async () => {
-  const confidenceInput = document.getElementById("confidenceInput").value;
-
-  if (!confidenceInput) {
-    showToast("Please select a confidence level before submitting.");
-    return;
-  }
-
-  const participantId = participantIdInput.value.trim();
-
-  const body = {
-    participantId: participantId,
-    confidenceFinal: confidenceInput,
-    generatedAt: new Date().toISOString(),
-  };
-
-  try {
-    const response = await fetch(submissionConfig.endpoint, {
-      method: submissionConfig.method || "POST",
-      headers: submissionConfig.headers || { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        annotation: body, // wrapped for Formspree
-      }),
-    });
-
-    if (!response.ok) throw new Error("Submission failed");
-
-    showToast("Confidence submitted. Thank you!");
-
-    // Hide question, show final message
-    document.getElementById("confidenceSection").hidden = true;
-    completionCard.hidden = false;
-
-  } catch (err) {
-    showToast("Could not submit. Try again.");
-    console.error(err);
-  }
-});
