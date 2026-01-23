@@ -16,24 +16,24 @@
       </p>
     </header>
 
-    <section class="card">
+    <section id="participantCard" class="card">
       <header class="card__header">
         <h2>1. Participant Details</h2>
       </header>
       <div class="card__body card__body--stack">
         <label class="field">
-          <span class="field__label">Participant ID</span>
+          <span class="field__label">Participant Email</span>
           <input
             id="participantIdInput"
             class="field__control"
             type="text"
             inputmode="text"
             autocomplete="off"
-            placeholder="e.g., ABC123"
+            placeholder="e.g., example@example.com"
           />
         </label>
         <p class="help" id="participantIdStatus">
-          Enter the ID provided by the study team. This is required before submitting.
+          Enter your email. This is required before submitting.
         </p>
         <label class="field">
           <span class="field__label">How are you feeling right now?</span>
@@ -51,7 +51,7 @@
       </div>
     </section>
 
-    <section class="card">
+    <section id="videoCard" class="card">
       <header class="card__header card__header--space">
         <h2 id="clipLabel">Loading Clip...</h2>
         <button id="replayBtn" type="button" class="secondary" disabled>Replay Clip</button>
@@ -69,7 +69,7 @@
       </div>
     </section>
 
-    <section class="card">
+    <section id="canvasCard" class="card">
       <header class="card__header card__header--space">
         <h2>3. Annotate Final Frame</h2>
         <div class="card__actions">
@@ -90,7 +90,7 @@
       </div>
     </section>
 
-    <section class="card">
+    <section id="submitCard" class="card">
       <header class="card__header">
         <h2>4. Submit Annotation</h2>
       </header>
@@ -103,6 +103,32 @@
         </p>
       </div>
     </section>
+
+    <section id="confidenceSection" class="card" hidden>
+      <header class="card__header">
+        <h2>Final Question</h2>
+      </header>
+      <div class="card__body card__body--stack">
+        <label class="field">
+          <span class="field__label">On a scale from 1 to 5, how confident did you feel that your incision lines were safe and did not cross a danger zone?</span>
+          <select id="confidenceInput" class="field__control" required>
+            <option value="">Select one</option>
+            <option value="1">1 – Very Insecure</option>
+            <option value="2">2 – Slightly insecure</option>
+            <option value="3">3 – Neutral / Not sure</option>
+            <option value="4">4 – With a certain level of confidence</option>
+            <option value="5">5 – Very confident</option>
+          </select>
+        </label>
+        <button id="submitConfidenceBtn" class="primary">Submit Confidence</button>
+      </div>
+    </section>
+
+    <section id="completionCard" class="card" hidden style="text-align: center; padding: 3rem 1rem;">
+      <h2>All Clips Completed</h2>
+      <p style="color: var(--text-muted); margin-top: 1rem;">Thank you for your participation. You may close this window.</p>
+    </section>
+
   </main>
 
   <template id="toastTemplate">
