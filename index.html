@@ -4,15 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cholecystectomy Incision Annotation - Phase 02</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
+
 <body>
   <main class="layout">
     <header class="layout__header">
       <h1>Cholecystectomy Incision Annotation - Phase 02</h1>
       <p>
-        Review the assigned operative clip, then draw the incision line on the frozen final frame.
-        Your progress is saved as you submit each clip.
+        Review each operative clip below, draw the incision line on the frozen final frame, and submit your annotations.
       </p>
     </header>
 
@@ -33,8 +31,7 @@
           />
         </label>
         <p class="help" id="participantIdStatus">
-          Enter the ID provided by the study team. This is required before submitting your
-          annotation.
+          Enter the ID provided by the study team. This is required before submitting annotations.
         </p>
         
         <label class="field">
@@ -53,61 +50,56 @@
       </div>
     </section>
 
-    <section class="card" aria-live="polite">
-      <header class="card__header card__header--space">
-        <h2>2. Watch Clip</h2>
-        <div class="card__actions">
-          <button id="replayBtn" type="button" class="ghost" disabled>Replay Clip</button>
-        </div>
-      </header>
-      <div class="card__body">
-        <h3 id="clipHeader" style="margin-top: 0; margin-bottom: 1rem;">Loading Clip...</h3>
-        
-        <div class="video-shell" id="videoShell">
-          <video id="caseVideo" playsinline preload="auto"></video>
-        </div>
-        <p class="help" id="videoStatus">Loading clip data...</p>
-      </div>
-    </section>
-
-    <section class="card">
-      <header class="card__header card__header--space">
-        <h2>3. Annotate Final Frame</h2>
-        <div class="card__actions">
-          <button id="clearLineBtn" type="button" class="ghost" disabled>Clear Line</button>
-        </div>
-      </header>
-      <div class="card__body">
-        <canvas id="finalFrame" width="1280" height="720" hidden></canvas>
-        <div class="canvas-container" id="canvasContainer" hidden>
-          <canvas id="annotationCanvas"></canvas>
-          <p class="canvas-hint">
-            Tap or click to place the start of the incision, drag, and release to finish. You can begin as
-            soon as the frozen frame appears, even if the clip is still playing above.
-          </p>
-        </div>
-          <p class="help" id="annotationStatus">The final frame appears below shortly. You can keep watching while it prepares.</p>
-      </div>
-    </section>
-
     <section class="card">
       <header class="card__header">
-        <h2>4. Submit Annotation</h2>
+        <h2>2. Review and Annotate Clips</h2>
       </header>
-      <div class="card__body card__body--stack">
-        <button id="submitAnnotationBtn" type="button" class="primary" disabled>Submit to investigator and Next Clip</button>
-        <p class="help" id="submissionStatus">
-          Draw the incision on the frozen frame to enable submission.
-        </p>
+      <div class="card__body">
+        <p class="help">Please review and annotate every clip below. Submit each annotation before moving to the next.</p>
       </div>
     </section>
+
+    <div id="clipsContainer"></div>
   </main>
 
   <template id="toastTemplate">
     <div class="toast" role="status" aria-live="polite"></div>
   </template>
 
-  <script src="clip-config.js"></script>
-  <script src="app.js"></script>
+  <template id="clipTemplate">
+    <div class="clip-section" data-clip-id="">
+      <div class="clip-header">
+        <h3>
+          <span class="clip-title"></span>
+          <span class="status-badge status-badge--pending">Pending</span>
+        </h3>
+        <p class="clip-subtitle">Watch the clip and draw your incision on the final frame</p>
+      </div>
+
+      <div class="video-shell">
+        <video class="clip-video" playsinline preload="auto"></video>
+      </div>
+      <p class="help clip-video-status">Loading clip...</p>
+
+      <div class="button-group">
+        <button type="button" class="ghost clip-replay-btn" disabled>Replay Clip</button>
+      </div>
+
+      <canvas class="clip-final-frame" width="1280" height="720" hidden></canvas>
+      <div class="canvas-container clip-canvas-container" hidden>
+        <canvas class="clip-annotation-canvas"></canvas>
+        <p class="canvas-hint">
+          Tap or click to place the start of the incision, drag, and release to finish.
+        </p>
+      </div>
+      <p class="help clip-annotation-status">The final frame will appear once the clip completes.</p>
+
+      <div class="button-group">
+        <button type="button" class="ghost clip-clear-btn" disabled>Clear Line</button>
+        <button type="button" class="primary clip-submit-btn" disabled>Submit & Next Clip</button>
+      </div>
+      <p class="help clip-submission-status">Draw the incision on the frozen frame to enable submission.</p>
+    </div>
+  </template>
 </body>
 </html>
