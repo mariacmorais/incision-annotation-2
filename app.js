@@ -1,7 +1,6 @@
 const participantIdInput = document.getElementById("participantIdInput");
 const participantIdStatus = document.getElementById("participantIdStatus");
-// REMOVED: const clipSelect = document.getElementById("clipSelect");
-const clipLabel = document.getElementById("clipLabel"); // NEW: For the dynamic header
+const clipLabel = document.getElementById("clipLabel");
 const replayBtn = document.getElementById("replayBtn");
 const video = document.getElementById("caseVideo");
 const finalFrameCanvas = document.getElementById("finalFrame");
@@ -13,6 +12,20 @@ const annotationStatus = document.getElementById("annotationStatus");
 const toastTemplate = document.getElementById("toastTemplate");
 const submitAnnotationBtn = document.getElementById("submitAnnotationBtn");
 const submissionStatus = document.getElementById("submissionStatus");
+
+// NEW: Elements for the final flow
+const confidenceSection = document.getElementById("confidenceSection");
+const confidenceInput = document.getElementById("confidenceInput");
+const submitConfidenceBtn = document.getElementById("submitConfidenceBtn");
+const completionCard = document.getElementById("completionCard");
+
+// Sections to hide when finished
+const annotationSections = [
+  document.getElementById("participantCard"),
+  document.getElementById("videoCard"),
+  document.getElementById("canvasCard"),
+  document.getElementById("submitCard")
+];
 
 const submissionConfig = window.ANNOTATION_SUBMISSION || {};
 const baseAdditionalFields = { ...(submissionConfig.additionalFields || {}) };
@@ -38,7 +51,7 @@ let capturedFrameTimeValue = 0;
 let helperVideo = null;
 let helperSeekAttempted = false;
 
-// NEW: Sequential Navigation State
+// Sequential Navigation State
 let currentClipIndex = 0;
 let clips = [];
 
@@ -67,7 +80,6 @@ function getClips() {
   return clipsList;
 }
 
-// NEW: Initialize App logic replacing populateClipSelect
 function initApp() {
   clips = getClips();
 
@@ -81,7 +93,6 @@ function initApp() {
   loadClip(currentClipIndex);
 }
 
-// NEW: Load expert JSON
 async function loadExpertAnnotation(clipId, annotationType = "gt") {
   const basePath = annotationType === "mock" ? "mock-annotations/" : "expert-annotations/";
   const suffix = annotationType === "mock" ? "_mock.json" : "_gt.json";
@@ -101,7 +112,6 @@ async function loadExpertAnnotation(clipId, annotationType = "gt") {
   }
 }
 
-// MODIFIED: Loads clip based on index rather than dropdown selection
 async function loadClip(index) {
   if (index < 0 || index >= clips.length) return;
 
@@ -198,7 +208,7 @@ function resetAnnotationState() {
     "Final frame will appear below shortly. You can keep watching the clip while it prepares.";
   clearLineBtn.disabled = true;
   submitAnnotationBtn.disabled = true;
-  submitAnnotationBtn.textContent = "Submit to Investigator and Next Clip"; // Reset button text
+  submitAnnotationBtn.textContent = "Submit to Investigator and Next Clip";
   
   if (submissionConfig.endpoint) {
     submissionStatus.textContent = participantIdValue
@@ -482,13 +492,11 @@ function normalizeFromPixels(pixels, referenceSize) {
 function redrawCanvas() {
   annotationCtx.clearRect(0, 0, annotationCanvas.width, annotationCanvas.height);
 
-  // 1. Draw Expert Lines (The Safety Corridor)
   if (expertLines && Array.isArray(expertLines.incisionDetails)) {
       const ctx = annotationCtx;
       const width = annotationCanvas.width;
       const height = annotationCanvas.height;
 
-      // Expert style: dashed green
       ctx.strokeStyle = "rgba(0, 255, 0, 0.7)"; 
       ctx.lineWidth = Math.max(2, width * 0.005);
       ctx.setLineDash([8, 6]); 
@@ -507,11 +515,9 @@ function redrawCanvas() {
           ctx.stroke();
       });
 
-      // Reset styles for user drawing
       ctx.setLineDash([]); 
   }
 
-  // 2. Draw User's Active Line (Always drawn on top)
   const line = activeLine;
   if (!line) return;
 
@@ -664,26 +670,65 @@ function clearLine() {
   updateSubmissionPayload();
 }
 
-// NEW: Function to handle Study Completion
+// MODIFIED: Transition to Confidence Question instead of completion text
 function finishStudy() {
-    video.pause();
-    video.removeAttribute("src");
-    video.load();
-    
-    document.querySelector(".layout").innerHTML = `
-      <section class="card">
-        <header class="card__header">
-          <h2>Session Complete</h2>
-        </header>
-        <div class="card__body">
-          <p>Thank you! You have annotated all assigned clips.</p>
-          <button onclick="window.location.reload()" class="secondary">Start Over</button>
-        </div>
-      </section>
-    `;
+  video.pause();
+  video.removeAttribute("src");
+  video.load();
+  
+  // Hide all annotation cards
+  annotationSections.forEach(section => {
+    if (section) section.hidden = true;
+  });
+
+  // Show Confidence Question
+  confidenceSection.hidden = false;
 }
 
-// MODIFIED: Submit, then load next clip
+// NEW: Handle Confidence Submission
+submitConfidenceBtn.addEventListener("click", async () => {
+  const score = confidenceInput.value;
+  if (!score) {
+    showToast("Please select a score before submitting.");
+    return;
+  }
+
+  submitConfidenceBtn.disabled = true;
+  submitConfidenceBtn.textContent = "Submitting...";
+
+  const payload = {
+    studyId: "CHOLE_PHASE_02_CONFIDENCE",
+    participantId: participantIdValue,
+    confidenceScore: score,
+    timestamp: new Date().toISOString()
+  };
+
+  try {
+     if (submissionConfig.endpoint) {
+        await fetch(submissionConfig.endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+     } else {
+        // Simulation
+        await new Promise(r => setTimeout(r, 600));
+        console.log("Mock Confidence Submission:", payload);
+     }
+     
+     // Success: Show Completion Card
+     confidenceSection.hidden = true;
+     completionCard.hidden = false;
+     showToast("Response saved. Thank you!");
+
+  } catch (error) {
+     console.error(error);
+     showToast("Error submitting confidence. Please try again.");
+     submitConfidenceBtn.disabled = false;
+     submitConfidenceBtn.textContent = "Submit Confidence";
+  }
+});
+
 async function submitAnnotation() {
   if (!latestPayload) {
     showToast("Draw the incision before submitting.");
@@ -750,7 +795,7 @@ async function submitAnnotation() {
     
     showToast("Annotation saved!");
 
-    // --- NEXT CLIP LOGIC ---
+    // Next Clip Logic
     currentClipIndex++;
     
     if (currentClipIndex < clips.length) {
@@ -758,7 +803,6 @@ async function submitAnnotation() {
     } else {
       finishStudy();
     }
-    // -----------------------
 
   } catch (error) {
     submissionStatus.textContent = "Submission failed. Please try again.";
@@ -806,7 +850,6 @@ function buildAdditionalFields(filenameHint) {
   return fields;
 }
 
-// REMOVED: clipSelect.addEventListener("change", loadSelectedClip);
 replayBtn.addEventListener("click", handleReplay);
 video.addEventListener("loadeddata", handleVideoLoaded);
 video.addEventListener("error", handleVideoError, { once: false });
